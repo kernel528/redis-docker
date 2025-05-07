@@ -1,4 +1,4 @@
-[![Build Status](http://drone.kernelsanders.biz:8080/api/badges/kernel528/redis-docker/status.svg?ref=refs/heads/7)](http://drone.kernelsanders.biz:8080/kernel528/redis-docker)
+[![Build Status](http://drone.kernelsanders.biz:8080/api/badges/kernel528/redis-docker/status.svg?ref=refs/heads/main)](http://drone.kernelsanders.biz:8080/kernel528/redis-docker)
 [![Latest Version](https://img.shields.io/github/v/tag/kernel528/redis-docker)](https://github.com/kernel528/redis-docker/releases/latest)
 [![Docker Pulls](https://img.shields.io/docker/pulls/kernel528/redis)](https://hub.docker.com/r/kernel528/redis)
 [![Docker Image Size (tag)](https://img.shields.io/docker/image-size/kernel528/redis/7.2.4)](https://hub.docker.com/r/kernel528/redis)
