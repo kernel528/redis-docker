@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: redis-cli-amd64
+name: redis-amd64
 
 trigger:
   branch:
@@ -14,8 +14,6 @@ steps:
     image: plugins/docker
     environment:
       DOCKER_BUILDKIT: 1
-      DOCKER_REPO:
-        from_secret: docker_repo
     settings:
       platforms:
         - linux/amd64
@@ -23,8 +21,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      repo:
-        from_secret: docker_repo_alpine
+      repo: kernel528/redis
       tags:
         - latest
         - '7.2.4'
@@ -44,7 +41,7 @@ steps:
 
 kind: pipeline
 type: docker
-name: main-redis-cli-amd64
+name: main-redis-amd64
 
 trigger:
   event:
@@ -57,9 +54,6 @@ trigger:
 steps:
   - name: main-docker-image-build
     image: plugins/docker
-    environment:
-      DOCKER_REPO:
-        from_secret: docker_repo
     when:
       event:
         - tag
@@ -68,14 +62,13 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      repo:
-        from_secret: docker_repo_alpine
+      repo: kernel528/redis
       tags:
         - ${DRONE_TAG}
 
   # Test docker image
-  - name: latest-redis-cli-amd64-test
-    image: kernel528/redis-cli:latest # Construct the test image path dynamically
+  - name: latest-redis-amd64-test
+    image: kernel528/redis:latest # Construct the test image path dynamically
     when:
       branch:
         - main
