@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: redis-cli-amd64
+name: redis-amd64
 
 trigger:
   branch:
@@ -44,7 +44,7 @@ steps:
 
 kind: pipeline
 type: docker
-name: main-redis-cli-amd64
+name: main-redis-amd64
 
 trigger:
   event:
@@ -74,8 +74,8 @@ steps:
         - ${DRONE_TAG}
 
   # Test docker image
-  - name: latest-redis-cli-amd64-test
-    image: kernel528/redis-cli:latest # Construct the test image path dynamically
+  - name: latest-redis-amd64-test
+    image: kernel528/redis:latest # Construct the test image path dynamically
     when:
       branch:
         - main
