@@ -14,8 +14,6 @@ steps:
     image: plugins/docker
     environment:
       DOCKER_BUILDKIT: 1
-      DOCKER_REPO:
-        from_secret: docker_repo
     settings:
       platforms:
         - linux/amd64
@@ -23,8 +21,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      repo:
-        from_secret: docker_repo_redis
+      repo: kernel528/redis
       tags:
         - latest
         - '7.2.4'
@@ -57,9 +54,6 @@ trigger:
 steps:
   - name: main-docker-image-build
     image: plugins/docker
-    environment:
-      DOCKER_REPO:
-        from_secret: docker_repo_redis
     when:
       event:
         - tag
@@ -68,8 +62,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      repo:
-        from_secret: docker_repo_alpine
+      repo: kernel528/redis
       tags:
         - ${DRONE_TAG}
 
