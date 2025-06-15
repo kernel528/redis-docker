@@ -24,8 +24,8 @@ steps:
       repo: kernel528/redis
       tags:
         - latest
-        - '7.2.4'
-        - '7.2.4-drone-build-${DRONE_BUILD_NUMBER}-amd64'
+        - '7.4.4'
+        - '7.4.4-drone-build-${DRONE_BUILD_NUMBER}-amd64'
 
   # Slack notification
   - name: slack-notification
