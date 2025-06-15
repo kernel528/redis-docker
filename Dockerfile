@@ -1,6 +1,9 @@
 FROM kernel528/alpine:3.22.0
 MAINTAINER Joe Sanders - copied from https://github.com/goodsmileduck/redis-cli/Dockerfile 
 
+# Set User to be root
+USER root
+
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN set -eux; \
 # alpine already has a gid 999, so we'll use the next id
