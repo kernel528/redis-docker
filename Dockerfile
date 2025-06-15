@@ -1,4 +1,4 @@
-FROM kernel528/alpine:3.21.3
+FROM kernel528/alpine:3.22.0
 MAINTAINER Joe Sanders - copied from https://github.com/goodsmileduck/redis-cli/Dockerfile 
 
 ARG REDIS_VERSION="7.2.4"
