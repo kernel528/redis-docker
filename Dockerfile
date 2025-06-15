@@ -1,7 +1,7 @@
 FROM kernel528/alpine:3.22.0
 MAINTAINER Joe Sanders - copied from https://github.com/goodsmileduck/redis-cli/Dockerfile 
 
-ARG REDIS_VERSION="7.2.4"
+ARG REDIS_VERSION="7.4.4"
 ARG REDIS_DOWNLOAD_URL="http://download.redis.io/releases/redis-${REDIS_VERSION}.tar.gz"
 
 USER root
