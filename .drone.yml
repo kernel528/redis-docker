@@ -4,7 +4,7 @@ name: redis-amd64
 
 trigger:
   branch:
-    - '7'
+    - '8'
   event:
     - pull_request
 
@@ -24,8 +24,9 @@ steps:
       repo: kernel528/redis
       tags:
         - latest
-        - '7.4.4'
-        - '7.4.4-drone-build-${DRONE_BUILD_NUMBER}-amd64'
+        - '8'
+        - '8.0.2'
+        - '8.0.2-drone-build-${DRONE_BUILD_NUMBER}-amd64'
 
   # Slack notification
   - name: slack-notification
