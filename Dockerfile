@@ -1,4 +1,4 @@
-FROM kernel528/alpine:3.22.1
+FROM kernel528/alpine:3.22.1.09
 MAINTAINER Joe Sanders - inspired by https://github.com/goodsmileduck/redis-cli/Dockerfile
 
 # Set User to be root
@@ -7,8 +7,8 @@ USER root
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN set -eux; \
 # alpine already has a gid 999, so we'll use the next id
-	addgroup -S -g 1001 redis; \
-	adduser -S -G redis -u 1001 redis
+	addgroup -S -g 1000 redis; \
+	adduser -S -G redis -u 999 redis
 
 # runtime dependencies
 RUN set -eux; \
@@ -18,8 +18,8 @@ RUN set -eux; \
 # we need setpriv package as busybox provides very limited functionality
 		setpriv \
 	;
-ENV REDIS_DOWNLOAD_URL=https://github.com/redis/redis/archive/refs/tags/8.0.3.tar.gz
-ENV REDIS_DOWNLOAD_SHA=2467b9608ecbcc2c0d27397c0c2406b499b6f68bc08ac9f6380b1faf2113ae6f
+ENV REDIS_DOWNLOAD_URL=http://download.redis.io/releases/redis-8.2.1.tar.gz
+ENV REDIS_DOWNLOAD_SHA=e2c1cb9dd4180a35b943b85dfc7dcdd42566cdbceca37d0d0b14c21731582d3e
 RUN set -eux; \
 	\
 	apk add --no-cache --virtual .build-deps \
@@ -47,7 +47,8 @@ RUN set -eux; \
 		build-base \
 		cargo \
 		clang \
-		clang18-libclang \
+		clang-static \
+		clang-libclang \
 		cmake \
 		curl \
 		g++ \
@@ -55,6 +56,8 @@ RUN set -eux; \
 		libffi-dev \
 		libgcc \
 		libtool \
+		llvm-dev \
+		ncurses-dev \
 		openssh \
 		openssl  \
 		py-virtualenv \
@@ -104,6 +107,8 @@ RUN set -eux; \
 	sed -ri 's!cd jemalloc && ./configure !&'"$extraJemallocConfigureFlags"' !' /usr/src/redis/deps/Makefile; \
 	grep -F "cd jemalloc && ./configure $extraJemallocConfigureFlags " /usr/src/redis/deps/Makefile; \
 	\
+# Disable static linking the C runtime for RediSearch's rust submodule
+	export RUST_DYN_CRT=1; \
 	export BUILD_TLS=yes; \
 	if [ "$BUILD_WITH_MODULES" = "yes" ]; then \
 		make -C /usr/src/redis/modules/redisjson get_source; \
@@ -150,6 +155,6 @@ COPY docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 6379
-# CMD ["redis-server"]
+#CMD ["redis-server"]
 
 CMD  ["redis-cli"]
