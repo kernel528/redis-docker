@@ -8,9 +8,10 @@
 
 * Maintainer:  kernel528
 
-# redis-docker
-
-* Maintainer:  kernel528
+## Description
+- Source:  https://github.com/redis/docker-library-redis/tree/8.2.2/alpine/Dockerfile
+- Docker Hub:  https://hub.docker.com/_/redis
+- Docker Hub:  https://hub.docker.com/kernel528/redis-docker
 
 ### How to build image...
 `docker image build --no-cache -t kernel528/redis-cli:7.2.4 -f Dockerfile .`
