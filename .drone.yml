@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: redis-amd64
+name: version-8
 
 trigger:
   branch:
@@ -10,7 +10,7 @@ trigger:
 
 # Build the docker image for amd64 architecture
 steps:
-  - name: amd64-image-build
+  - name: v8-docker-image-build
     image: plugins/docker
     environment:
       DOCKER_BUILDKIT: 1
@@ -68,7 +68,7 @@ steps:
         - ${DRONE_TAG}
 
   # Test docker image
-  - name: latest-redis-amd64-test
+  - name: latest-docker-test
     image: kernel528/redis:latest # Construct the test image path dynamically
     when:
       branch:
