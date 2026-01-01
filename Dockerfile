@@ -1,4 +1,4 @@
-FROM kernel528/alpine:3.22.2
+FROM kernel528/alpine:3.23.2
 MAINTAINER Joe Sanders - inspired by https://github.com/goodsmileduck/redis-cli/Dockerfile
 
 # Set User to be root

@@ -9,7 +9,7 @@
 * Maintainer:  kernel528
 
 ## Description
-- Source:  https://github.com/redis/docker-library-redis/tree/8.2.2/alpine/Dockerfile
+- Source:  https://github.com/redis/docker-library-redis (select branch for version.)
 - Docker Hub:  https://hub.docker.com/_/redis
 - Docker Hub:  https://hub.docker.com/kernel528/redis-docker
 
