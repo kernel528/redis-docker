@@ -1,4 +1,8 @@
 FROM kernel528/alpine:3.23.3
+MAINTAINER Joe Sanders - inspired by https://github.com/goodsmileduck/redis-cli/Dockerfile
+
+# Set User to be root
+USER root
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN set -eux; \
