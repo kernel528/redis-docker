@@ -1,4 +1,4 @@
-FROM kernel528/alpine:3.22.2
+FROM kernel528/alpine:3.23.3
 MAINTAINER Joe Sanders - inspired by https://github.com/goodsmileduck/redis-cli/Dockerfile
 
 # Set User to be root
@@ -18,8 +18,8 @@ RUN set -eux; \
 # we need setpriv package as busybox provides very limited functionality
 		setpriv \
 	;
-ENV REDIS_DOWNLOAD_URL=https://github.com/redis/redis/archive/refs/tags/8.4.0.tar.gz
-ENV REDIS_DOWNLOAD_SHA=b947d9015622669b5bee8ec954f658b3278d42dbefae23a92d9b7704bfe143f9
+ARG REDIS_DOWNLOAD_URL=https://github.com/redis/redis/archive/refs/tags/8.6-rc1.tar.gz
+ARG REDIS_DOWNLOAD_SHA=dc387a093cb4f956953492eeb613e833b53ee23a45625bde01cc6d2497a5c0e7
 RUN set -eux; \
 	\
 	apk add --no-cache --virtual .build-deps \
@@ -46,9 +46,9 @@ RUN set -eux; \
 		bsd-compat-headers \
 		build-base \
 		cargo \
-		clang \
-		clang-static \
-		clang-libclang \
+		clang21 \
+		clang21-static \
+		clang21-libclang \
 		cmake \
 		curl \
 		g++ \
@@ -56,7 +56,7 @@ RUN set -eux; \
 		libffi-dev \
 		libgcc \
 		libtool \
-		llvm-dev \
+		llvm21-dev \
 		ncurses-dev \
 		openssh \
 		openssl  \
@@ -109,6 +109,7 @@ RUN set -eux; \
 	\
 # Disable static linking the C runtime for RediSearch's rust submodule
 	export RUST_DYN_CRT=1; \
+	export PATH="/usr/lib/llvm21/bin:$PATH"; \
 	export BUILD_TLS=yes; \
 	if [ "$BUILD_WITH_MODULES" = "yes" ]; then \
 		make -C /usr/src/redis/modules/redisjson get_source; \
@@ -148,12 +149,10 @@ RUN set -eux; \
 	redis-cli --version; \
 	redis-server --version;
 RUN mkdir /data && chown redis:redis /data
-VOLUME /data
 WORKDIR /data
 
 COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 6379
 CMD ["redis-server"]
