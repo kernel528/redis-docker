@@ -82,8 +82,8 @@ steps:
         - push
     commands:
       - redis-server --version
-      - redis-server --daemonize yes
-      - redis-cli ping
+      - redis-server --daemonize yes --bind 127.0.0.1 --port 6379 --dir /tmp
+      - 'for i in 1 2 3 4 5; do redis-cli ping && break; sleep 1; done'
       - redis-cli set smoke_test ok
       - redis-cli get smoke_test
       - redis-cli shutdown
@@ -151,8 +151,8 @@ steps:
         - push
     commands:
       - redis-server --version
-      - redis-server --daemonize yes
-      - redis-cli ping
+      - redis-server --daemonize yes --bind 127.0.0.1 --port 6379 --dir /tmp
+      - 'for i in 1 2 3 4 5; do redis-cli ping && break; sleep 1; done'
       - redis-cli shutdown
 
   # Slack notification
