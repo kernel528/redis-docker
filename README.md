@@ -8,7 +8,7 @@
 Maintainer: kernel528
 
 ## Overview
-This repository builds a Redis image based on the upstream `redis/docker-library-redis` Alpine Dockerfile, but uses the custom base image `kernel528/alpine:3.23.3`.
+This repository builds a Redis image based on the upstream `redis/docker-library-redis` Alpine Dockerfile, but uses the custom base image `kernel528/alpine:3.23.3` and tracks Redis `8.6-rc1`.
 
 Upstream reference:
 - https://github.com/redis/docker-library-redis/tree/release/8.4/alpine
@@ -22,29 +22,29 @@ Upstream reference:
 
 ## Build
 ```bash
-docker image build --no-cache -t kernel528/redis:8.4.0 -f Dockerfile .
+docker image build --no-cache -t kernel528/redis:8.6-rc1 -f Dockerfile .
 ```
 
 ## Run
 Standalone server:
 ```bash
-docker container run -d --name redis -p 6379:6379 kernel528/redis:8.4.0
+docker container run -d --name redis -p 6379:6379 kernel528/redis:8.6-rc1
 ```
 
 CLI only:
 ```bash
-docker container run -it --rm kernel528/redis:8.4.0 redis-cli --version
+docker container run -it --rm kernel528/redis:8.6-rc1 redis-cli --version
 ```
 
 ## Refresh Workflow
 1) Update `Dockerfile` base image and Redis source URL/SHA to match the desired upstream release.
-2) Update `.drone.yml` tags for the new Redis version (for example `8.4.0` and `8.4.0-drone-build-<build>-amd64`).
+2) Update `.drone.yml` tags for the new Redis version (for example `8.6-rc1` and `8.6-rc1-drone-build-<build>-amd64`).
 3) Build and test locally.
 4) Merge into the `8` branch to publish versioned images.
 5) Merge into `main` to refresh the `latest` tag, then create a Git tag for the release.
 
 ## CI Tagging (Drone)
-- `8.4.0` branch: validation build only (no publish).
-- `8` branch push: publishes versioned tags like `8` and `8.4.0`.
+- `8.6-rc1` branch: validation build only (no publish).
+- `8` branch push: publishes versioned tags like `8` and `8.6-rc1`.
 - `main` branch push: publishes `latest`.
 - Git tags: publish `${DRONE_TAG}`.
