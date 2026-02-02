@@ -81,6 +81,7 @@ RUN set -eux; \
 	mkdir -p /usr/src/redis; \
 	tar -xzf redis.tar.gz -C /usr/src/redis --strip-components=1; \
 	rm redis.tar.gz; \
+	sed -i 's/^MODULE_VERSION = v8\\.4\\.2$/MODULE_VERSION = v8.4.1/' /usr/src/redis/modules/redisearch/Makefile; \
 	\
 # disable Redis protected mode [1] as it is unnecessary in context of Docker
 # (ports are not automatically exposed when running inside Docker, but rather explicitly by specifying -p / -P)
