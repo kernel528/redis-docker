@@ -1,5 +1,31 @@
 kind: pipeline
 type: docker
+name: version-8-4-0
+
+trigger:
+  branch:
+    - '8.4.0'
+  event:
+    - push
+    - pull_request
+
+# Validate version branch builds without publishing
+steps:
+  - name: v8-4-0-docker-image-build
+    image: plugins/docker
+    environment:
+      DOCKER_BUILDKIT: 1
+    settings:
+      platforms:
+        - linux/amd64
+      repo: kernel528/redis
+      tags:
+        - '8.4.0-branch-${DRONE_BUILD_NUMBER}-amd64'
+      dry_run: true
+---
+
+kind: pipeline
+type: docker
 name: version-8
 
 trigger:
@@ -23,9 +49,7 @@ steps:
         - linux/amd64
       repo: kernel528/redis
       tags:
-        - '8'
-        - '8.4.0'
-        - '8.4.0-drone-build-${DRONE_BUILD_NUMBER}-amd64'
+        - '8.4.0-pr-${DRONE_PULL_REQUEST}-amd64'
       dry_run: true
 
   - name: v8-docker-image-build-release
@@ -47,6 +71,19 @@ steps:
         - '8'
         - '8.4.0'
         - '8.4.0-drone-build-${DRONE_BUILD_NUMBER}-amd64'
+
+  # Test docker image
+  - name: v8-docker-test
+    image: kernel528/redis:8.4.0
+    when:
+      branch:
+        - '8'
+      event:
+        - push
+    commands:
+      - cat /etc/alpine-release
+      - uname -a
+      - redis-cli --version
 
   # Slack notification
   - name: slack-notification

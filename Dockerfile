@@ -1,8 +1,4 @@
-FROM kernel528/alpine:3.22.2
-MAINTAINER Joe Sanders - inspired by https://github.com/goodsmileduck/redis-cli/Dockerfile
-
-# Set User to be root
-USER root
+FROM kernel528/alpine:3.23.3
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN set -eux; \
@@ -18,8 +14,8 @@ RUN set -eux; \
 # we need setpriv package as busybox provides very limited functionality
 		setpriv \
 	;
-ENV REDIS_DOWNLOAD_URL=https://github.com/redis/redis/archive/refs/tags/8.4.0.tar.gz
-ENV REDIS_DOWNLOAD_SHA=b947d9015622669b5bee8ec954f658b3278d42dbefae23a92d9b7704bfe143f9
+ARG REDIS_DOWNLOAD_URL=https://github.com/redis/redis/archive/refs/tags/8.4.0.tar.gz
+ARG REDIS_DOWNLOAD_SHA=b947d9015622669b5bee8ec954f658b3278d42dbefae23a92d9b7704bfe143f9
 RUN set -eux; \
 	\
 	apk add --no-cache --virtual .build-deps \
@@ -153,7 +149,7 @@ WORKDIR /data
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 6379
 CMD ["redis-server"]
