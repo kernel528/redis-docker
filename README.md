@@ -11,14 +11,13 @@ Maintainer: kernel528
 This repository builds a Redis image based on the upstream `redis/docker-library-redis` Alpine Dockerfile, but uses the custom base image `kernel528/alpine:3.23.3` and tracks Redis `8.6-rc1`.
 
 Upstream reference:
-- https://github.com/redis/docker-library-redis/tree/release/8.4/alpine
+- https://github.com/redis/docker-library-redis
 
 ## Project Structure
 - `Dockerfile`: Redis server image build (Alpine).
-- `Dockerfile.arm64`: ARM64 helper image (redis-cli focused).
 - `docker-entrypoint.sh`: Upstream entrypoint logic with module loading and permission fixes.
 - `redis.conf`: Sample configuration file.
-- `redis-stack.yml`: Local stack deployment template.
+- `../docker-swarm/stacks/redis-stack.yml`: Local swarm stack deployment template.
 
 ## Build
 ```bash
