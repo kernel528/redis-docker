@@ -1,17 +1,17 @@
 kind: pipeline
 type: docker
-name: version-8.6-rc1
+name: version-8.6.4
 
 trigger:
   branch:
-    - '8.6-rc1'
+    - '8.6.4'
   event:
     - push
     - pull_request
 
 # Validate version branch builds without publishing
 steps:
-  - name: v8.6-rc1-docker-image-build
+  - name: v8.6.4-docker-image-build
     image: plugins/docker
     environment:
       DOCKER_BUILDKIT: 1
@@ -20,7 +20,7 @@ steps:
         - linux/amd64
       repo: kernel528/redis
       tags:
-        - '8.6-rc1-branch-${DRONE_BUILD_NUMBER}-amd64'
+        - '8.6.4-branch-${DRONE_BUILD_NUMBER}-amd64'
       dry_run: true
 ---
 
@@ -49,7 +49,7 @@ steps:
         - linux/amd64
       repo: kernel528/redis
       tags:
-        - '8.6-rc1-pr-${DRONE_PULL_REQUEST}-amd64'
+        - '8.6.4-pr-${DRONE_PULL_REQUEST}-amd64'
       dry_run: true
 
   - name: v8-docker-image-build-release
@@ -69,12 +69,12 @@ steps:
       repo: kernel528/redis
       tags:
         - '8'
-        - '8.6-rc1'
-        - '8.6-rc1-drone-build-${DRONE_BUILD_NUMBER}-amd64'
+        - '8.6.4'
+        - '8.6.4-drone-build-${DRONE_BUILD_NUMBER}-amd64'
 
   # Test docker image
   - name: v8-docker-test
-    image: kernel528/redis:8.6-rc1
+    image: kernel528/redis:8.6.4
     when:
       branch:
         - '8'
