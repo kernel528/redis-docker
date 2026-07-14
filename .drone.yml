@@ -1,67 +1,18 @@
 kind: pipeline
 type: docker
-name: version-8.6.4
-
-trigger:
-  branch:
-    - '8.6.4'
-  event:
-    - push
-    - pull_request
-
-# Validate version branch builds without publishing
-steps:
-  - name: v8.6.4-docker-image-build
-    image: plugins/docker
-    environment:
-      DOCKER_BUILDKIT: 1
-    settings:
-      platforms:
-        - linux/amd64
-      repo: kernel528/redis
-      tags:
-        - '8.6.4-branch-${DRONE_BUILD_NUMBER}-amd64'
-      dry_run: true
----
-
-kind: pipeline
-type: docker
 name: version-8
 
 trigger:
   branch:
     - '8'
   event:
-    - push
     - pull_request
 
-# Build the docker image for amd64 architecture
+# Build the docker image for the major version branch
 steps:
   - name: v8-docker-image-build
     image: plugins/docker
-    environment:
-      DOCKER_BUILDKIT: 1
-    when:
-      event:
-        - pull_request
     settings:
-      platforms:
-        - linux/amd64
-      repo: kernel528/redis
-      tags:
-        - '8.6.4-pr-${DRONE_PULL_REQUEST}-amd64'
-      dry_run: true
-
-  - name: v8-docker-image-build-release
-    image: plugins/docker
-    environment:
-      DOCKER_BUILDKIT: 1
-    when:
-      event:
-        - push
-    settings:
-      platforms:
-        - linux/amd64
       username:
         from_secret: docker_username
       password:
@@ -70,23 +21,8 @@ steps:
       tags:
         - '8'
         - '8.6.4'
-        - '8.6.4-drone-build-${DRONE_BUILD_NUMBER}-amd64'
-
-  # Test docker image
-  - name: v8-docker-test
-    image: kernel528/redis:8.6.4
-    when:
-      branch:
-        - '8'
-      event:
-        - push
-    commands:
-      - redis-server --version
-      - redis-server --daemonize yes --bind 127.0.0.1 --port 6379 --dir /tmp
-      - 'for i in 1 2 3 4 5; do redis-cli ping && break; sleep 1; done'
-      - redis-cli set smoke_test ok
-      - redis-cli get smoke_test
-      - redis-cli shutdown
+        - '8-drone-build-${DRONE_BUILD_NUMBER}'
+        - '8.6.4-drone-build-${DRONE_BUILD_NUMBER}'
 
   # Slack notification
   - name: slack-notification
@@ -102,7 +38,7 @@ steps:
 
 kind: pipeline
 type: docker
-name: main-redis-amd64
+name: main
 
 trigger:
   event:
@@ -117,20 +53,6 @@ steps:
     image: plugins/docker
     when:
       event:
-        - push
-    settings:
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-      repo: kernel528/redis
-      tags:
-        - latest
-
-  - name: main-docker-image-build-tag
-    image: plugins/docker
-    when:
-      event:
         - tag
     settings:
       username:
@@ -139,11 +61,12 @@ steps:
         from_secret: docker_password
       repo: kernel528/redis
       tags:
-        - '${DRONE_TAG}'
+        - ${DRONE_TAG}
+        - latest
 
   # Test docker image
   - name: latest-docker-test
-    image: kernel528/redis:latest # Construct the test image path dynamically
+    image: kernel528/redis:latest
     when:
       branch:
         - main
@@ -153,6 +76,8 @@ steps:
       - redis-server --version
       - redis-server --daemonize yes --bind 127.0.0.1 --port 6379 --dir /tmp
       - 'for i in 1 2 3 4 5; do redis-cli ping && break; sleep 1; done'
+      - redis-cli set smoke_test ok
+      - redis-cli get smoke_test
       - redis-cli shutdown
 
   # Slack notification
