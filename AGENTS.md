@@ -2,10 +2,9 @@
 
 ## Project Structure & Module Organization
 - `Dockerfile` builds the Redis server image from source on Alpine.
-- `Dockerfile.arm64` builds a lightweight ARM64 redis-cli image.
 - `docker-entrypoint.sh` mirrors upstream entrypoint logic for permissions and module loading.
 - `redis.conf` contains a sample configuration.
-- `redis-stack.yml` is a local stack example for deployments.
+- `../docker-swarm/stacks/redis-stack.yml` is the local swarm stack example for deployments.
 
 ## Build, Test, and Development Commands
 - `docker image build --no-cache -t kernel528/redis:8.6-rc1 -f Dockerfile .` builds the server image locally.
