@@ -21,8 +21,10 @@ steps:
       tags:
         - '8'
         - '8.6.4'
+        - '8.6.4-3.24.1_1'
         - '8-drone-build-${DRONE_BUILD_NUMBER}'
         - '8.6.4-drone-build-${DRONE_BUILD_NUMBER}'
+        - '8.6.4-3.24.1_1-drone-build-${DRONE_BUILD_NUMBER}'
 
   # Slack notification
   - name: slack-notification
