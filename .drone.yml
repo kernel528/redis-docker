@@ -19,8 +19,12 @@ steps:
         from_secret: docker_password
       repo: kernel528/redis
       tags:
-        - 'pr-${DRONE_PULL_REQUEST}-build-${DRONE_BUILD_NUMBER}'
-      dry_run: true
+        - '8'
+        - '8.6.4'
+        - '8.6.4-3.24.1_1'
+        - '8-drone-build-${DRONE_BUILD_NUMBER}'
+        - '8.6.4-drone-build-${DRONE_BUILD_NUMBER}'
+        - '8.6.4-3.24.1_1-drone-build-${DRONE_BUILD_NUMBER}'
 
   # Slack notification
   - name: slack-notification
@@ -40,7 +44,10 @@ name: main
 
 trigger:
   event:
+    - push
     - tag
+  branch:
+    - main
 
 # Build the docker image for the main branch & tagged release
 steps:
@@ -58,6 +65,22 @@ steps:
       tags:
         - ${DRONE_TAG}
         - latest
+
+  # Test docker image
+  - name: latest-docker-test
+    image: kernel528/redis:latest
+    when:
+      branch:
+        - main
+      event:
+        - push
+    commands:
+      - redis-server --version
+      - redis-server --daemonize yes --bind 127.0.0.1 --port 6379 --dir /tmp
+      - 'for i in 1 2 3 4 5; do redis-cli ping && break; sleep 1; done'
+      - redis-cli set smoke_test ok
+      - redis-cli get smoke_test
+      - redis-cli shutdown
 
   # Slack notification
   - name: slack-notification
