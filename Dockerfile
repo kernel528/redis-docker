@@ -1,4 +1,4 @@
-FROM kernel528/alpine:3.24.1_1
+FROM kernel528/alpine:3.24.3_1
 MAINTAINER Joe Sanders - inspired by https://github.com/goodsmileduck/redis-cli/Dockerfile
 
 # Set User to be root
@@ -18,8 +18,8 @@ RUN set -eux; \
 # we need setpriv package as busybox provides very limited functionality
 		setpriv \
 	;
-ARG REDIS_DOWNLOAD_URL=https://github.com/redis/redis/archive/refs/tags/8.6.4.tar.gz
-ARG REDIS_DOWNLOAD_SHA=a2029c96311ab1ec2ae489076ae900b6497b3beaa7dc379de26b5df48f696f6c
+ARG REDIS_DOWNLOAD_URL=https://github.com/redis/redis/archive/refs/tags/8.6.7.tar.gz
+ARG REDIS_DOWNLOAD_SHA=96598fae03314298a06366f57e640310b88751ec6aaad404b14b7a22bc45cad8
 RUN set -eux; \
 	\
 	apk add --no-cache --virtual .build-deps \
@@ -112,12 +112,12 @@ RUN set -eux; \
 	export PATH="/usr/lib/llvm21/bin:$PATH"; \
 	export BUILD_TLS=yes; \
 	if [ "$BUILD_WITH_MODULES" = "yes" ]; then \
-		make -C /usr/src/redis/modules/redisjson get_source; \
+		make -s -C /usr/src/redis/modules/redisjson get_source; \
 		sed -i 's/^RUST_FLAGS=$/RUST_FLAGS += -C target-feature=-crt-static/' /usr/src/redis/modules/redisjson/src/Makefile ; \
 		grep -E 'RUST_FLAGS' /usr/src/redis/modules/redisjson/src/Makefile; \
 	fi; \
-	make -C /usr/src/redis -j "$(nproc)" all; \
-	make -C /usr/src/redis install; \
+	make -s -C /usr/src/redis -j "$(nproc)" all; \
+	make -s -C /usr/src/redis install; \
 	\
 # TODO https://github.com/redis/redis/pull/3494 (deduplicate "redis-server" copies)
 	serverMd5="$(md5sum /usr/local/bin/redis-server | cut -d' ' -f1)"; export serverMd5; \
@@ -130,7 +130,7 @@ RUN set -eux; \
 		-exec ln -svfT 'redis-server' '{}' ';' \
 	; \
 	\
-	make -C /usr/src/redis distclean; \
+	make -s -C /usr/src/redis distclean; \
 	rm -r /usr/src/redis; \
 	\
 	runDeps="$( \
