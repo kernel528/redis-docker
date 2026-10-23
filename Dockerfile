@@ -1,4 +1,4 @@
-FROM kernel528/alpine:3.24.1_1
+FROM kernel528/alpine:3.24.3_1
 MAINTAINER Joe Sanders - inspired by https://github.com/goodsmileduck/redis-cli/Dockerfile
 
 # Set User to be root
@@ -18,8 +18,8 @@ RUN set -eux; \
 # we need setpriv package as busybox provides very limited functionality
 		setpriv \
 	;
-ARG REDIS_DOWNLOAD_URL=https://github.com/redis/redis/archive/refs/tags/8.6.4.tar.gz
-ARG REDIS_DOWNLOAD_SHA=a2029c96311ab1ec2ae489076ae900b6497b3beaa7dc379de26b5df48f696f6c
+ARG REDIS_DOWNLOAD_URL=https://github.com/redis/redis/archive/refs/tags/8.6.7.tar.gz
+ARG REDIS_DOWNLOAD_SHA=96598fae03314298a06366f57e640310b88751ec6aaad404b14b7a22bc45cad8
 RUN set -eux; \
 	\
 	apk add --no-cache --virtual .build-deps \

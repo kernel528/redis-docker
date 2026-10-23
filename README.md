@@ -8,7 +8,7 @@
 Maintainer: kernel528
 
 ## Overview
-This repository builds a Redis image based on the upstream `redis/docker-library-redis` Alpine Dockerfile, but uses the custom base image `kernel528/alpine:3.24.1_1` and tracks Redis `8.6.4`.
+This repository builds a Redis image based on the upstream `redis/docker-library-redis` Alpine Dockerfile, but uses the custom base image `kernel528/alpine:3.24.3_1` and tracks Redis `8.6.7`.
 
 Upstream reference:
 - https://github.com/redis/docker-library-redis
@@ -21,18 +21,18 @@ Upstream reference:
 
 ## Build
 ```bash
-docker image build --no-cache -t kernel528/redis:8.6.4-3.24.1_1 -f Dockerfile .
+docker image build --no-cache -t kernel528/redis:8.6.7-3.24.3_1 -f Dockerfile .
 ```
 
 ## Run
 Standalone server:
 ```bash
-docker container run -d --name redis -p 6379:6379 kernel528/redis:8.6.4-3.24.1_1
+docker container run -d --name redis -p 6379:6379 kernel528/redis:8.6.7-3.24.3_1
 ```
 
 CLI only:
 ```bash
-docker container run -it --rm kernel528/redis:8.6.4-3.24.1_1 redis-cli --version
+docker container run -it --rm kernel528/redis:8.6.7-3.24.3_1 redis-cli --version
 ```
 
 ## Refresh Workflow
@@ -47,7 +47,7 @@ docker container run -it --rm kernel528/redis:8.6.4-3.24.1_1 redis-cli --version
 This independent repository is coordinated by [`docker-workspace`](https://github.com/kernel528/docker-workspace), consumes [`kernel528/alpine`](https://github.com/kernel528/alpine-docker), and publishes `kernel528/redis` for [`docker-swarm`](https://github.com/kernel528/docker-swarm). Publish and verify the Alpine tag before a base refresh. Publish and smoke-test the immutable Redis release before updating `stacks/redis-stack.yml`; deploy the stack separately and preserve the previous tag for rollback.
 
 ## CI Tagging (Drone)
-- PRs targeting `8` publish configured tags such as `8`, `8.6.4`, and `8.6.4-3.24.1_1`.
+- PRs targeting `8` publish configured tags such as `8`, `8.6.7`, and `8.6.7-3.24.3_1`.
 - This PR behavior is retained for current CI compatibility; release-looking PR tags are not release-eligible until the merged `main` commit receives a GitHub tag/release.
 - `main` branch pushes test the existing `latest` image; they do not publish it.
 - Git tags publish `${DRONE_TAG}` and `latest`.
