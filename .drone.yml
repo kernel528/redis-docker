@@ -1,88 +1,90 @@
 kind: pipeline
 type: docker
-name: version-8
+name: redis-rootless-image-validation
+
+node:
+  ci-role: rootless-image-smoke
+  platform: linux-amd64
 
 trigger:
+  repo:
+    - kernel528/redis-docker
   branch:
     - '8'
+    - main
   event:
     - pull_request
+    - push
+    - custom
 
-# Build the docker image for the major version branch
 steps:
-  - name: v8-docker-image-build
-    image: plugins/docker
-    settings:
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-      repo: kernel528/redis
-      tags:
-        - '8'
-        - '8.6.7'
-        - '8.6.7-3.24.3_1'
-        - '8-drone-build-${DRONE_BUILD_NUMBER}'
-        - '8.6.7-drone-build-${DRONE_BUILD_NUMBER}'
-        - '8.6.7-3.24.3_1-drone-build-${DRONE_BUILD_NUMBER}'
+  - name: build-and-smoke
+    image: docker:27-cli
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+      DOCKER_BUILDKIT: "0"
+    commands:
+      - scripts/ci-rootless-redis-smoke.sh
+    volumes:
+      - name: podman-socket
+        path: /var/run/docker.sock
 
-  # Slack notification
-  - name: slack-notification
-    image: plugins/slack
-    when:
-      status:
-        - failure
-        - success
-    settings:
-      webhook:
-        from_secret: slack_webhook_drone_alerts
+volumes:
+  - name: podman-socket
+    host:
+      path: /run/user/1001/podman/podman.sock
+
 ---
 
 kind: pipeline
 type: docker
-name: main
+name: redis-maintenance-candidate
 
 trigger:
+  repo:
+    - kernel528/redis-docker
+  branch:
+    - '8'
   event:
     - push
-    - tag
-  branch:
-    - main
 
-# Build the docker image for the main branch & tagged release
+services:
+  - name: docker
+    image: docker:27.5.1-dind
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    volumes:
+      - name: candidate-dockersock
+        path: /var/run
+
 steps:
-  - name: main-docker-image-build
-    image: plugins/docker
-    when:
-      event:
-        - tag
-    settings:
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-      repo: kernel528/redis
-      tags:
-        - ${DRONE_TAG}
-        - latest
-
-  # Test docker image
-  - name: latest-docker-test
-    image: kernel528/redis:latest
-    when:
-      branch:
-        - main
-      event:
-        - push
+  - name: build-and-smoke-candidate
+    image: docker:27.5.1-cli
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+      REDIS_IMAGE_REPO: kernel528/redis
+    volumes:
+      - name: candidate-dockersock
+        path: /var/run
     commands:
-      - redis-server --version
-      - redis-server --daemonize yes --bind 127.0.0.1 --port 6379 --dir /tmp
-      - 'for i in 1 2 3 4 5; do redis-cli ping && break; sleep 1; done'
-      - redis-cli set smoke_test ok
-      - redis-cli get smoke_test
-      - redis-cli shutdown
+      - scripts/ci-build-redis-candidate.sh
 
-  # Slack notification
+  - name: publish-candidate
+    image: docker:27.5.1-cli
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+      REDIS_IMAGE_REPO: kernel528/redis
+      DOCKER_USERNAME:
+        from_secret: docker_username
+      DOCKER_PASSWORD:
+        from_secret: docker_password
+    volumes:
+      - name: candidate-dockersock
+        path: /var/run
+    commands:
+      - scripts/ci-publish-redis-candidate.sh
+
   - name: slack-notification
     image: plugins/slack
     when:
@@ -92,3 +94,107 @@ steps:
     settings:
       webhook:
         from_secret: slack_webhook_drone_alerts
+
+volumes:
+  - name: candidate-dockersock
+    temp: {}
+
+---
+
+kind: pipeline
+type: docker
+name: main-redis
+
+trigger:
+  repo:
+    - kernel528/redis-docker
+  branch:
+    - main
+  event:
+    - push
+
+steps:
+  - name: slack-notification
+    image: plugins/slack
+    when:
+      status:
+        - failure
+        - success
+    settings:
+      webhook:
+        from_secret: slack_webhook_drone_alerts
+
+---
+
+kind: pipeline
+type: docker
+name: redis-immutable-release
+
+# Release tags are manually created from reviewed main commits.
+trigger:
+  repo:
+    - kernel528/redis-docker
+  event:
+    - tag
+
+services:
+  - name: docker
+    image: docker:27.5.1-dind
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    volumes:
+      - name: release-dockersock
+        path: /var/run
+
+steps:
+  - name: build-and-smoke-release
+    image: docker:27.5.1-cli
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+      REDIS_IMAGE_REPO: kernel528/redis
+    volumes:
+      - name: release-dockersock
+        path: /var/run
+    commands:
+      - scripts/ci-build-redis-release.sh
+
+  - name: check-immutable-tag-unused
+    image: docker:27.5.1-cli
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+      REDIS_IMAGE_REPO: kernel528/redis
+    volumes:
+      - name: release-dockersock
+        path: /var/run
+    commands:
+      - scripts/ci-check-redis-release-tag-unused.sh
+
+  - name: publish-immutable-release
+    image: docker:27.5.1-cli
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+      REDIS_IMAGE_REPO: kernel528/redis
+      DOCKER_USERNAME:
+        from_secret: docker_username
+      DOCKER_PASSWORD:
+        from_secret: docker_password
+    volumes:
+      - name: release-dockersock
+        path: /var/run
+    commands:
+      - scripts/ci-publish-redis-release.sh
+
+  - name: slack-notification
+    image: plugins/slack
+    when:
+      status:
+        - failure
+        - success
+    settings:
+      webhook:
+        from_secret: slack_webhook_drone_alerts
+
+volumes:
+  - name: release-dockersock
+    temp: {}
