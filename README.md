@@ -8,7 +8,7 @@
 Maintainer: kernel528
 
 ## Overview
-This repository builds a Redis image based on the upstream `redis/docker-library-redis` Alpine Dockerfile, but uses the custom base image `kernel528/alpine:3.24.3_3` and tracks Redis `8.6.7`.
+This repository builds a Redis image based on the upstream `redis/docker-library-redis` Alpine Dockerfile, but uses the custom base image `kernel528/alpine:3.24.4_1` and tracks Redis `8.6.7`.
 
 Upstream reference:
 - https://github.com/redis/docker-library-redis
@@ -21,18 +21,18 @@ Upstream reference:
 
 ## Build
 ```bash
-docker image build --no-cache -t kernel528/redis:8.6.7-3.24.3_3 -f Dockerfile .
+docker image build --no-cache -t kernel528/redis:8.6.7-3.24.4_1 -f Dockerfile .
 ```
 
 ## Run
 Standalone server:
 ```bash
-docker container run -d --name redis -p 6379:6379 kernel528/redis:8.6.7-3.24.3_3
+docker container run -d --name redis -p 6379:6379 kernel528/redis:8.6.7-3.24.4_1
 ```
 
 CLI only:
 ```bash
-docker container run -it --rm kernel528/redis:8.6.7-3.24.3_3 redis-cli --version
+docker container run -it --rm kernel528/redis:8.6.7-3.24.4_1 redis-cli --version
 ```
 
 ## Refresh Workflow
@@ -49,7 +49,7 @@ This independent repository is coordinated by [`docker-workspace`](https://githu
 
 ## CI Tagging (Drone)
 - PRs targeting `8` run rootless exact-image checks and publish nothing.
-- Pushes to `8` publish a unique candidate tag such as `8.6.7-3.24.3_3-drone-build-<build>-amd64`; candidate tags are not deployment inputs.
+- Pushes to `8` publish a unique candidate tag such as `8.6.7-3.24.4_1-drone-build-<build>-amd64`; candidate tags are not deployment inputs.
 - Git tags from reviewed `main` use `8.6.7-YYMMDD` and publish immutable release tags; only after success do `8`, `8.6.7`, and `latest` move to that release.
 - This repository is public and must be trusted in Drone and added to the isolated runner's exact repository allowlist after pipeline review. Rootless PR jobs receive no registry credentials.
 - The smoke run uses a disposable container with persistence disabled; it does not alter the Redis stack, volumes, or deployed data.
